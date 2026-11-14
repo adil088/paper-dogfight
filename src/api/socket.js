@@ -1,16 +1,25 @@
 import { Client } from '@stomp/stompjs';
+import { BASE } from './client';
 
 // Same host as the page; the Vite dev server proxies /ws to the backend.
+// const WS_URL =
+//   import.meta.env.VITE_WS_URL ??
+//   `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+
 const WS_URL =
-  import.meta.env.VITE_WS_URL ??
-  `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
+  import.meta.env.VITE_WS_URL ?? `${BASE.replace(/^http/, 'ws')}/ws`;
 
 /**
  * Subscribes to /topic/games/{id}. The client reconnects on its own; `onConnect` fires after every
  * (re)connection so the caller can reload the state it may have missed. Returns a cleanup function.
  */
 export function connectToGame(gameId, { onState, onConnect, onDisconnect }) {
-  const client = new Client({ brokerURL: WS_URL, reconnectDelay: 2000 });
+  const client = new Client({
+    brokerURL: WS_URL,
+    reconnectDelay: 2000,
+    heartbeatIncoming: 10000,
+    heartbeatOutgoing: 10000,
+  });
 
   client.onConnect = () => {
     client.subscribe(`/topic/games/${gameId}`, (message) => onState(JSON.parse(message.body)));

@@ -2,7 +2,7 @@
 // Empty = same origin; the Vite dev server proxies /api to the backend.
 // const BASE = import.meta.env.VITE_API_URL ?? '';
 
-const BASE = import.meta.env.VITE_API_URL || 'https://paper-dogfight-backend.onrender.com';
+export const BASE = import.meta.env.VITE_API_URL || 'https://paper-dogfight-backend.onrender.com';
 
 async function request(path, { method = 'GET', token, body } = {}) {
   let res;
